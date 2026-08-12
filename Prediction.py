@@ -27,7 +27,7 @@ Fixes applied vs. the original notebook:
      is written alongside it for your own inspection, not for submission.
 
 Usage:
-    python freight_rate_predict.py \
+    python Prediction.py \
         --train-csv train-test.csv \
         --validation-csv validation.csv \
         --output-csv validation_predictions.csv \
