@@ -41,7 +41,7 @@ import sys
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from xgboost import XGBRegressor
 from catboost import CatBoostRegressor, Pool
@@ -82,7 +82,7 @@ def load_and_clean(path: str) -> pd.DataFrame:
     df["month"] = df["date"].dt.month
     df["day_of_year"] = df["date"].dt.dayofyear
     df["year"] = df["date"].dt.year
-    df = df.drop(columns=["date"])
+    # df = df.drop(columns=["date"])
 
     return df
 
@@ -198,9 +198,13 @@ def main():
     X = df[FEATURE_COLS]
     y = df[TARGET_COL]
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=args.test_size, random_state=args.random_state
-    )
+    df_sorted = df.sort_values("date")
+    split_idx = int(len(df_sorted) * (1 - args.test_size))
+    train_idx = df_sorted.index[:split_idx]
+    test_idx = df_sorted.index[split_idx:]
+
+    X_train, X_test = X.loc[train_idx], X.loc[test_idx]
+    y_train, y_test = y.loc[train_idx], y.loc[test_idx]
 
     # Train on log1p(target) — posted_rate is right-skewed (a small number of
     # very expensive loads). Predictions are inverse-transformed with expm1()
